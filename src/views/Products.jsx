@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router";
+import { useNavigate, Link } from "react-router";
 import axios from "axios";
 
 function Products() {
@@ -12,7 +12,7 @@ function Products() {
   const [cartInfos, setCartInfos] = useState([]);
 
   const { VITE_APP_API_BASE, VITE_APP_API_PATH } = import.meta.env;
-  const navigate = useNavigate();
+
   useEffect(() => {
     getProducts();
     getCart();
@@ -34,19 +34,7 @@ function Products() {
       comment: "",
     },
   });
-  const onSubmit = (data) => {
-    // 表單送出實際的資料內容
-    if (cartInfos.carts.length < 1) {
-      alert("請加入商品到購物車");
-      return;
-    }
-    createOrder(data);
-    setIsLoading(true);
-    // setTimeout
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
-  };
+
   const getProducts = async () => {
     setIsLoading(true);
     try {
@@ -117,38 +105,6 @@ function Products() {
       .then((res) => {
         setCartInfos(res.data.data);
       });
-  };
-  const deleteOneFromCart = async (cartProduct_id) => {
-    setIsLoading(true);
-    try {
-      await axios.delete(
-        `https://ec-course-api.hexschool.io/v2/api/wei777/cart/${cartProduct_id}`
-      );
-      await getCart();
-    } catch (error) {
-      console.error("刪除失敗", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  const deleteAllFromCart = async () => {
-    setIsLoading(true);
-    try {
-      await axios.delete(
-        "https://ec-course-api.hexschool.io/v2/api/wei777/carts",
-        {
-          headers: {
-            Accept: "application/json",
-          },
-        }
-      );
-      console.log("刪除成功");
-      getCart();
-    } catch (error) {
-      console.error("刪除失敗", error);
-    } finally {
-      setIsLoading(false);
-    }
   };
   const createOrder = async (data) => {
     setIsLoading(true);
@@ -314,13 +270,10 @@ function Products() {
                     </td>
                     <td>
                       <div className="btn-group btn-group-sm">
-                        <button
+                        <Link
                           type="button"
                           className="btn btn-outline-secondary"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            navigate(`/product/${product.id}`);
-                          }}
+                          to={`/product/${product.id}`}
                         >
                           <div>查看更多</div>
                           {isPartLoading && (
@@ -330,7 +283,7 @@ function Products() {
                               </span>
                             </div>
                           )}
-                        </button>
+                        </Link>
                         <button
                           type="button"
                           className="btn btn-outline-danger"
